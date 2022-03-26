@@ -35,7 +35,10 @@ impl<'a, 'b, F: Lex<'a>> Iterator for Lexer<'a, 'b, F> {
         }
 
         let ret;
-        (ret, self.rem) = self.f.lex(self.rem)?;
+        (ret, self.rem) = match self.f.lex(self.rem)? {
+            Ok(x) => x,
+            Err(x) => return Some(Err(x)),
+        };
         Some(Ok(ret))
     }
 }

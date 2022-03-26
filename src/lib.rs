@@ -11,7 +11,7 @@ pub trait Lex {
 
 impl<F, T, E> Lex for F
 where
-    F: for<'a> FnMut(&'a str) -> Result<'a, T, E>,
+    F: for<'a> FnMut(&'a str) -> Res<'a, T, E>,
 {
     type Token = T;
     type Error = E;

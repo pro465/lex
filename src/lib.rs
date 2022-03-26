@@ -1,4 +1,4 @@
-#[cfg_attr(test, no_std)]
+#![cfg_attr(test, no_std)]
 
 pub trait Lex {
     type Token;

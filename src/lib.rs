@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 
-pub type Res<'a, T, E> = Result<(T, &'a str), E>;
+pub type Res<'a, T, E> = Option<Result<(T, &'a str), E>>;
 
 pub trait Lex<'a> {
     type Token;
@@ -35,7 +35,7 @@ impl<'a, 'b, F: Lex<'a>> Iterator for Lexer<'a, 'b, F> {
         }
 
         let ret;
-        (ret, self.rem) = self.f.lex(self.rem).ok()?;
+        (ret, self.rem) = self.f.lex(self.rem)?;
         Some(Ok(ret))
     }
 }

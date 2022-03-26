@@ -1,3 +1,5 @@
+#[cfg_attr(test, no_std)]
+
 pub trait Lex {
     type Token;
     type Error;
@@ -38,13 +40,4 @@ impl<'a, 'b, F: Lex> Iterator for TokenIter<'a, 'b, F> {
 
 pub fn lex<'a, 'b, F: Lex>(s: &'a str, f: &'b mut F) -> TokenIter<'a, 'b, F> {
     TokenIter { rem: s, f }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
 }

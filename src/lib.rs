@@ -1,30 +1,32 @@
-#![cfg_attr(test, no_std)]
+#![cfg_attr(not(test), no_std)]
+
+pub type Res<'a, T, E> = Result<(T, &'a str), E>;
 
 pub trait Lex {
     type Token;
     type Error;
 
-    fn lex<'a>(&mut self, _: &'a str) -> Result<(Self::Token, &'a str), Self::Error>;
+    fn lex<'a>(&mut self, _: &'a str) -> Res<'a, Self::Token, Self::Error>;
 }
 
 impl<F, T, E> Lex for F
 where
-    F: for<'a> FnMut(&'a str) -> Result<(T, &'a str), E>,
+    F: for<'a> FnMut(&'a str) -> Result<'a, T, E>,
 {
     type Token = T;
     type Error = E;
 
-    fn lex<'a>(&mut self, s: &'a str) -> Result<(Self::Token, &'a str), Self::Error> {
+    fn lex<'a>(&mut self, s: &'a str) -> Res<'a, Self::Token, Self::Error> {
         (self)(s)
     }
 }
 
-pub struct TokenIter<'a, 'b, F: Lex> {
+pub struct Lexer<'a, 'b, F: Lex> {
     rem: &'a str,
     f: &'b mut F,
 }
 
-impl<'a, 'b, F: Lex> Iterator for TokenIter<'a, 'b, F> {
+impl<'a, 'b, F: Lex> Iterator for Lexer<'a, 'b, F> {
     type Item = Result<F::Token, F::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -38,6 +40,6 @@ impl<'a, 'b, F: Lex> Iterator for TokenIter<'a, 'b, F> {
     }
 }
 
-pub fn lex<'a, 'b, F: Lex>(s: &'a str, f: &'b mut F) -> TokenIter<'a, 'b, F> {
-    TokenIter { rem: s, f }
+pub fn lex<'a, 'b, F: Lex>(s: &'a str, f: &'b mut F) -> Lexer<'a, 'b, F> {
+    Lexer { rem: s, f }
 }
